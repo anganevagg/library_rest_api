@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 /* Inicializacion de la base de datos */
@@ -9,14 +10,10 @@ app.set('port',  process.env.PORT || 3000)
 
 /* Middlewares */
 app.use(express.json())
+app.use(morgan('dev'))
 
 /* Rutas de la aplicación */
-app.use('/',(req, res)=>{
-	res.json({
-		status:'online'
-	})
-})
-app.use('/api', require('./routes/libro.routes'))
+app.use('/api/libros', require('./routes/libro.routes'))
 
 /* Inicialización del servidor */
 app.listen(app.get('port'),()=>{
