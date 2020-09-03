@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+
 const app = express()
 
 /* Inicializacion de la base de datos */
@@ -9,8 +10,8 @@ const { mongoose } = require('./database')
 app.set('port',  process.env.PORT || 3000)
 
 /* Middlewares */
-app.use(express.json())
 app.use(morgan('dev'))
+app.use(express.json())
 
 /* Rutas de la aplicación */
 app.use('/api/libros', require('./routes/libro.routes'))

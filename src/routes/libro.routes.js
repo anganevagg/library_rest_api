@@ -1,22 +1,28 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
 /* Esquema de libro */
-const Libro = require('../models/schemas')
+const Libro = require("../models/schemas");
+const lib = require("mongoose/lib");
 
 /* Rutas para las consultas */
 
-/** @GET
- * Tomará todas los registros de la colección libros
- */
-router.get("/", async(req, res) => {
-	const libro = await Libro.find()
-	res.json(libro)
+/* Consulta de todos los registros */
+router.get("/", async (req, res) => {
+	const libros = await Libro.find();
+	res.json(req.params);
+});
+
+/* Consulta dentro de un arreglo */
+router.get("/buscar/autor/:nombre", async (req, res)=>{
+	const libros = await Libro.find({"autores.nombre":req.params.nombre})
+	res.json(libros)
 })
 
-router.post("/", (req, res) => {
-
+/* Consulta dentro de un subdocumento */
+router.get("/buscar/edicion/:edicion",async(req,res)=>{
+	const libros = await Libro.find({'ficha_bibliografica.edicion':req.params.edicion})
+	res.json(libros)
 })
 
-
-module.exports = router
+module.exports = router;
