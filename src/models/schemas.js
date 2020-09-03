@@ -19,12 +19,10 @@ const LibroSchema = new Schema({
 		}
 	}],
 	categoria:{
-		type: Schema.Types.ObjectId,
-		ref:"Opiniones"
+		type: String
 	},
 	tipo:{
-		type: Schema.Types.ObjectId,
-		ref:"Tipos"
+		type: String
 	},
 	ficha_bibliografica:{
 		año:Number,
