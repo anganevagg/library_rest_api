@@ -9,7 +9,7 @@ const LibroSchema = new Schema({
 			type: String,
 			required:true
 		},
-		pais:{
+		Pais:{
 			type:String,
 			required: true
 		},

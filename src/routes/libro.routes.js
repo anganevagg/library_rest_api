@@ -10,8 +10,8 @@ const lib = require("mongoose/lib");
 /* CREATE */
 router.post("/", async (req, res)=>{
 	const { codigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica } = req.body
-	const libro = new Libro({ odigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica })
-	libro.save()
+	const libro = new Libro({ codigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica })
+	await libro.save()
 	res.json({status:"libro guardado"})
 })
 
