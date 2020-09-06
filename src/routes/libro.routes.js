@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose")
 const router = express.Router();
 
 /* Esquema de libro */
@@ -8,11 +7,27 @@ const Libro = require("../models/libro");
 /* Rutas para las consultas */
 
 /* CREATE */
-router.post("/", async (req, res)=>{
-	const { codigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica } = req.body
-	const libro = new Libro({ codigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica })
+router.post("/", async (req, res) => {
+	const {
+		codigo_isbn,
+		titulo,
+		autores,
+		categoria,
+		tipo,
+		ficha_bibliografica
+	} = req.body
+	const libro = new Libro({
+		codigo_isbn,
+		titulo,
+		autores,
+		categoria,
+		tipo,
+		ficha_bibliografica
+	})
 	await libro.save()
-	res.json({status:"libro guardado"})
+	res.json({
+		status: "libro guardado"
+	})
 })
 
 /* READ  */
@@ -22,9 +37,23 @@ router.get("/", async (req, res) => {
 });
 
 /* UPDATE */
-router.put("/:id", async(req, res)=>{
-	const { codigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica } = req.body
-	const newLibro = { codigo_isbn, titulo, autores, categoria, tipo, ficha_bibliografica }
+router.put("/:id", async (req, res) => {
+	const {
+		codigo_isbn,
+		titulo,
+		autores,
+		categoria,
+		tipo,
+		ficha_bibliografica
+	} = req.body
+	const newLibro = {
+		codigo_isbn,
+		titulo,
+		autores,
+		categoria,
+		tipo,
+		ficha_bibliografica
+	}
 	await Libro.findByIdAndUpdate(req.params.id, newLibro)
 	res.json({
 		status: "Libro actualizado"
@@ -32,10 +61,10 @@ router.put("/:id", async(req, res)=>{
 })
 
 /* DELETE */
-router.delete("/:id", async(req, res)=>{
+router.delete("/:id", async (req, res) => {
 	await Libro.findByIdAndRemove(req.params.id)
 	res.json({
-		status:"Libro eliminado"
+		status: "Libro eliminado"
 	})
 })
 
@@ -45,9 +74,11 @@ db.libros.find({
 	'titulo':/r$/
 }) 
 */
-router.get("/buscar/ultimaLetra/:letra", async(req,res)=>{
+router.get("/buscar/ultimaLetra/:letra", async (req, res) => {
 	const r = new RegExp(`${req.params.letra}$`)
-	const re = await Libro.find({titulo:r})
+	const re = await Libro.find({
+		titulo: r
+	})
 	res.json(re)
 })
 
@@ -64,12 +95,11 @@ db.libros.find({
    ]
 })
 */
-router.get("/buscar/and/:letra/:letraFinal", async(req,res)=>{
-	const r1= new RegExp(`^${req.params.letra}`)
-	const r2= new RegExp(`${req.params.letraFinal}$`)
+router.get("/buscar/and/:letra/:letraFinal", async (req, res) => {
+	const r1 = new RegExp(`^${req.params.letra}`)
+	const r2 = new RegExp(`${req.params.letraFinal}$`)
 	const re = await Libro.find({
-		"$and":[
-			{
+		"$and": [{
 				titulo: r1
 			},
 			{
@@ -92,17 +122,14 @@ $set: {titulo:'La vida de Simon Bolivar'}
 }
 )
 */
-router.get("/actualizar/titulo/:titulo/:nuevoTitulo",async(req,res)=>{
-	await Libro.update(
-		{
-			titulo:req.params.titulo
-		},
-		{
-			"$set":{
-				titulo:req.params.nuevoTitulo
-			}
+router.get("/actualizar/titulo/:titulo/:nuevoTitulo", async (req, res) => {
+	await Libro.update({
+		titulo: req.params.titulo
+	}, {
+		"$set": {
+			titulo: req.params.nuevoTitulo
 		}
-	)
+	})
 	res.json({
 		status: "Titulo actualizado"
 	})
@@ -121,13 +148,13 @@ $set: {'autores.$.nombre':'El libertador'}
 }
 )
 */
-router.get("/actualizar/autor/:titulo/:nombre/:nombreNuevo", async(req,res)=>{
+router.get("/actualizar/autor/:titulo/:nombre/:nombreNuevo", async (req, res) => {
 	await Libro.update({
-		titulo:req.params.titulo,
-		'autores.nombre':req.params.nombre
-	},{
-		'$set':{
-			'autores.$.nombre':req.params.nombreNuevo
+		titulo: req.params.titulo,
+		'autores.nombre': req.params.nombre
+	}, {
+		'$set': {
+			'autores.$.nombre': req.params.nombreNuevo
 		}
 	})
 	res.json({
@@ -151,28 +178,19 @@ db.libros.update(
       }
 })
 */
-router.get("/push/ficha/:id/:editorial/:pais", async(req,res)=>{
-	console.log(req.params.id)
-	const re= await Libro.findByIdAndUpdate(req.params.id,{"$push":{
-		ficha_bibliografica:{
-			editorial:{
-				nombre_editorial:req.params.editorial,
+router.get("/push/ficha/:id/:editorial/:pais", async (req, res) => {
+	const re = await Libro.findByIdAndUpdate(req.params.id, {
+		"$push": {
+			'ficha_bibliografica.editorial': {
+				nombre_editorial: req.params.editorial,
 				pais: req.params.pais
 			}
 		}
-	}})
-	// await Libro.update({
-	// 	_id:req.params.id
-	// }, {
-	// 	"$push":{
-	// 		
-    //     }
-	// })
+	})
 	res.json(
-		// status: "Push correcto"
+		{status: "Push correcto"},
 		re
 	)
 })
-
 
 module.exports = router;

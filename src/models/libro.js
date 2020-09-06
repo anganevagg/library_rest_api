@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose
 
 const LibroSchema = new Schema({
-	_id:String,
 	codigo_isbn: Number,
 	titulo: String,
 	autores:[{
