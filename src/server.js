@@ -15,6 +15,7 @@ app.use(express.json())
 
 /* Rutas de la aplicación */
 app.use('/api/libros', require('./routes/libro.routes'))
+app.use('/api/opiniones', require('./routes/opinion.routes'))
 
 /* Inicialización del servidor */
 app.listen(app.get('port'),()=>{

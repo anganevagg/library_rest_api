@@ -1,9 +1,9 @@
 const express = require("express");
+const mongoose = require("mongoose")
 const router = express.Router();
 
 /* Esquema de libro */
-const Libro = require("../models/schemas");
-const lib = require("mongoose/lib");
+const Libro = require("../models/libro");
 
 /* Rutas para las consultas */
 
@@ -39,84 +39,140 @@ router.delete("/:id", async(req, res)=>{
 	})
 })
 
-/* Consulta dentro de un arreglo */
-router.get("/buscar/autor/:nombre", async (req, res)=>{
-	const libros = await Libro.find({"autores.nombre":req.params.nombre})
-	res.json(libros)
-})
-
-/* Consulta dentro de un subdocumento */
-router.get("/buscar/edicion/:edicion",async(req,res)=>{
-	const libros = await Libro.find({'ficha_bibliografica.edicion':req.params.edicion})
-	res.json(libros)
-})
-
-/* Consulta con una condición */
-router.get("/buscar/categoria/:categoria", async(req,res)=>{
-	const { id, titulo, autor } = req.body
-	const libro= await Libro.find({categoria:req.params.categoria},{_id:0,titulo:1,autor:1})
-	res.json(libro)
-})
-
-/* Lista NIN */
-router.get("/buscar/nin/:categoria", async(req, res)=>{
-	const categoria = req.params.categoria
-	const re = await Libro.find({"$nin":[categoria]},{_id:0,titulo:1,autor:1})
-	res.json(re)
-})
-
-/* Consulta con filtro de rango de valores */
-router.get("/buscar/paginas/menorA/:paginas", async(req, res)=>{
-	const re = await Libro.find({'ficha_bibliografica.paginas':{"$gt":req.params.paginas}})
-	res.json(re)
-})
-
-/* Consulta con dos condiciones y el operador AND */
-router.get("/buscar/multiple", async(req, res)=>{
-	const { nCategoria, paginas } = req.body
-	const re = await Libro.find({
-		"$and":[
-			{categoria:{
-				"$nin":[nCategoria]
-			}},
-			{'ficha_bibliografica.paginas':{
-				"$gt":paginas
-			}}
-		]
-	},{_id:0,titulo:1,cliente:1})
-	res.json(re)
-})
-
-/* Consulta con ordenamiento */
-router.get("/buscar/ordenar", async(req, res)=>{
-	const { paginas, nCategoria }= req.body
-	const re = await Libro.find({
-		"$and":[
-			{
-				categoria:{
-					"$nin":[nCategoria]
-				}
-			},
-			{
-				"ficha_bibliografica.paginas":{
-					"$gt":paginas
-				}
-			}
-		]
-	},{_id:0,titulo:1,tipo:1,categoria:1}).sort({tipo:1,categoria:1})
-})
-
-/* Consulta un array de contenidos de un atributo */
-router.get("/buscar/autores",async(req,res)=>{
-	const re = await Libro.distinct("autores")
-	res.json(re)
-})
-
-/* Consulta por cadena que empieza por una letra */
-router.get("/buscar/letra/:letra",async(req,res)=>{
-	const r = new RegExp(`^${req.params.letra}`)
+/* 
+Consulta por cadena que termina con una letra
+db.libros.find({
+	'titulo':/r$/
+}) 
+*/
+router.get("/buscar/ultimaLetra/:letra", async(req,res)=>{
+	const r = new RegExp(`${req.params.letra}$`)
 	const re = await Libro.find({titulo:r})
 	res.json(re)
 })
+
+/* 
+Consulta con dos condiciones y operador $and
+
+db.libros.find({
+   $and:[ {
+    'titulo':/^H/
+    },
+    {
+    'categoria':/o$/
+    }
+   ]
+})
+*/
+router.get("/buscar/and/:letra/:letraFinal", async(req,res)=>{
+	const r1= new RegExp(`^${req.params.letra}`)
+	const r2= new RegExp(`${req.params.letraFinal}$`)
+	const re = await Libro.find({
+		"$and":[
+			{
+				titulo: r1
+			},
+			{
+				categoria: r2
+			}
+		]
+	})
+	res.json(re)
+})
+
+/*  
+Actualización mediante el uso de $set
+
+db.libros.update(
+{
+    titulo:'Simon Bolivar'
+},
+{
+$set: {titulo:'La vida de Simon Bolivar'}
+}
+)
+*/
+router.get("/actualizar/titulo/:titulo/:nuevoTitulo",async(req,res)=>{
+	await Libro.update(
+		{
+			titulo:req.params.titulo
+		},
+		{
+			"$set":{
+				titulo:req.params.nuevoTitulo
+			}
+		}
+	)
+	res.json({
+		status: "Titulo actualizado"
+	})
+})
+
+/* 
+Actualización de un elemento del arreglo
+
+db.libros.update(
+{
+    titulo:'La vida de Simon Bolivar',
+    'autores.nombre':'Simon Bolivar '
+},
+{
+$set: {'autores.$.nombre':'El libertador'}
+}
+)
+*/
+router.get("/actualizar/autor/:titulo/:nombre/:nombreNuevo", async(req,res)=>{
+	await Libro.update({
+		titulo:req.params.titulo,
+		'autores.nombre':req.params.nombre
+	},{
+		'$set':{
+			'autores.$.nombre':req.params.nombreNuevo
+		}
+	})
+	res.json({
+		status: "Autor actualizado"
+	})
+})
+
+/* 
+Añadir de un elemento a un arreglo
+
+db.libros.update(
+  { "_id" : ObjectId ("5f545dcd3bf21c3608eae5ef")},
+  {$push:{
+	  ficha_bibliografica.editorial:
+                  {
+					  nombre_editorial:"Grupo Editorial Patria"
+					  ,pais: "Peru"
+				  }
+
+               
+      }
+})
+*/
+router.get("/push/ficha/:id/:editorial/:pais", async(req,res)=>{
+	console.log(req.params.id)
+	const re= await Libro.findByIdAndUpdate(req.params.id,{"$push":{
+		ficha_bibliografica:{
+			editorial:{
+				nombre_editorial:req.params.editorial,
+				pais: req.params.pais
+			}
+		}
+	}})
+	// await Libro.update({
+	// 	_id:req.params.id
+	// }, {
+	// 	"$push":{
+	// 		
+    //     }
+	// })
+	res.json(
+		// status: "Push correcto"
+		re
+	)
+})
+
 
 module.exports = router;

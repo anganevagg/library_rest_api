@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose
 
 const LibroSchema = new Schema({
+	_id:String,
 	codigo_isbn: Number,
 	titulo: String,
 	autores:[{
@@ -29,34 +30,15 @@ const LibroSchema = new Schema({
 		paginas:Number,
 		edicion:String,
 		encuadernacion:String,
-		editorial:{
-			nombre_editoriale:String,
+		editorial:[{
+			nombre_editorial:String,
 			tipo:String,
 			pais:String,
 			idioma:String
 
-		},
+		}],
 		Descripcion:String
 	}
 })
 
-// const OpinionSchema = new Schema({
-// 	codigo_isbn:{
-// 		type: Schema.Types.ObjectId
-// 	},
-// 	opiniones:[
-// 		{
-// 			nombre : String,
-// 			correo : String,
-// 			pais : String,
-// 			comentario : String,
-// 			Fecha : String,
-// 			puntuacion : Number,
-// 			critica : String
-// 		}
-// 	]
-// })
-
-
 module.exports = mongoose.model("Libro", LibroSchema);
-// module.exports = mongoose.model("Opinion", OpinionSchema);
