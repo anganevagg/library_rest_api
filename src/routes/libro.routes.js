@@ -3,6 +3,7 @@ const router = express.Router();
 
 /* Esquema de libro */
 const Libro = require("../models/libro");
+const Tipo_Libro=require("../models/tipo_libro")
 
 /* Rutas para las consultas */
 
@@ -127,14 +128,14 @@ db.libros.update(
   }      
 ) 
 */
-router.put("/update/edicion/:id",async(req,res)=>{
+router.put("/update/edicion/:id", async (req, res) => {
 	await Libro.findByIdAndUpdate(req.params.id, {
-		"$set":{
-			'ficha_bibliografica.edicion':req.body.edicion
+		"$set": {
+			'ficha_bibliografica.edicion': req.body.edicion
 		}
 	})
 	res.json({
-		status:"Edicion actualizada"
+		status: "Edicion actualizada"
 	})
 })
 
@@ -151,14 +152,14 @@ db.libros.insert(
 	        }
 }
 ) */
-router.put("/insertar/edicion/:id",async(req,res)=>{
+router.put("/insertar/edicion/:id", async (req, res) => {
 	await Libro.findByIdAndUpdate(req.params.id, {
-		"$set":{
-			'ficha_bibliografica.edicion':req.body.edicion
+		"$set": {
+			'ficha_bibliografica.edicion': req.body.edicion
 		}
 	})
 	res.json({
-		status:"Edicion insertada"
+		status: "Edicion insertada"
 	})
 })
 
@@ -179,10 +180,10 @@ db.libros.update(
   }      
 ) 
 */
-router.delete("/delete/edicion/:id",async(req,res)=>{
-	await Libro.findByIdAndUpdate(req.params.id,{
-		"$unset":{
-			"ficha_bibliografica.edicion" : "cuarta"
+router.delete("/delete/edicion/:id", async (req, res) => {
+	await Libro.findByIdAndUpdate(req.params.id, {
+		"$unset": {
+			"ficha_bibliografica.edicion": "cuarta"
 		}
 	})
 })
@@ -210,12 +211,16 @@ db.libros.update(
   }
 ) 
 */
-router.post("/insertar/autores/:id",async(req,res)=>{
-	const {nombre,Fecha_nacimiento,Pais}=req.body
-	await Libro.findByIdAndUpdate(req.params.id,{
-		"$push":{
-			autores:{
-				"$each":[{
+router.post("/insertar/autores/:id", async (req, res) => {
+	const {
+		nombre,
+		Fecha_nacimiento,
+		Pais
+	} = req.body
+	await Libro.findByIdAndUpdate(req.params.id, {
+		"$push": {
+			autores: {
+				"$each": [{
 					nombre,
 					Fecha_nacimiento,
 					Pais
@@ -224,7 +229,7 @@ router.post("/insertar/autores/:id",async(req,res)=>{
 		}
 	})
 	res.json({
-		status:"Autor agregado"
+		status: "Autor agregado"
 	})
 })
 
@@ -246,13 +251,13 @@ db.libros.update(
       
   }
 ) */
-router.post("/insertar/nombre",async(req,res)=>{
-	await Libro.find({},{
-		"$set":{
-			'autores.$[elem].Fecha_nacimiento':"18/28/1887"
+router.post("/insertar/nombre", async (req, res) => {
+	await Libro.find({}, {
+		"$set": {
+			'autores.$[elem].Fecha_nacimiento': "18/28/1887"
 		},
-		"arrayFilters":[{
-			"elem.nombre":"Simon Bolivar"
+		"arrayFilters": [{
+			"elem.nombre": "Simon Bolivar"
 		}]
 	})
 })
@@ -275,11 +280,11 @@ db.libros.update(
 )
 */
 
-router.delete("/delete/array/:id",async(req,res)=>{
-	await Libro.findByIdAndUpdate(req.params.id,{
-		"$pull":{
-			autores:{
-				nombre:"Jhon Lennon"
+router.delete("/delete/array/:id", async (req, res) => {
+	await Libro.findByIdAndUpdate(req.params.id, {
+		"$pull": {
+			autores: {
+				nombre: "Jhon Lennon"
 			}
 		}
 	})
@@ -301,11 +306,22 @@ db.libros.find(
         {categoria:1}
 ) */
 
-router.get("/buscar/and/ordenar/:categoria/:paginas",async(req,res)=>{
-	const re = await Libro.find({"$and":[
-		{categoria:{"$nin":[req.params.categoria]}},
-		{'ficha_bibliografica.paginas':{"$gt":req.params.paginas}}
-	]}).sort({categoria:1})
+router.get("/buscar/and/ordenar/:categoria/:paginas", async (req, res) => {
+	const re = await Libro.find({
+		"$and": [{
+				categoria: {
+					"$nin": [req.params.categoria]
+				}
+			},
+			{
+				'ficha_bibliografica.paginas': {
+					"$gt": req.params.paginas
+				}
+			}
+		]
+	}).sort({
+		categoria: 1
+	})
 	res.json(re)
 })
 
@@ -323,11 +339,25 @@ db.libros.find(
 _id:0, titulo:1, tipo:1, categoria:1
 }
 ) */
-router.get("/buscar/and/proyeccion/:categoria/:paginas",async(req,res)=>{
-	const re=await Libro.find({"$and":[
-		{categoria:{"$nin":[req.params.categoria]}},
-		{'ficha_bibliografica.paginas':{"$gt":req.params.paginas}}
-	]},{_id:0,titulo:1,tipo:1,categoria:1})
+router.get("/buscar/and/proyeccion/:categoria/:paginas", async (req, res) => {
+	const re = await Libro.find({
+		"$and": [{
+				categoria: {
+					"$nin": [req.params.categoria]
+				}
+			},
+			{
+				'ficha_bibliografica.paginas': {
+					"$gt": req.params.paginas
+				}
+			}
+		]
+	}, {
+		_id: 0,
+		titulo: 1,
+		tipo: 1,
+		categoria: 1
+	})
 	res.json(re)
 })
 
@@ -339,9 +369,89 @@ db.libros.find(
 }
 
 ) */
-router.get("/bucar/letra/:letra",async(req,res)=>{
+router.get("/bucar/letra/:letra", async (req, res) => {
 	const r = new RegExp(`^${req.params.letra}`)
-	const re = await Libro.find({titulo:r})
+	const re = await Libro.find({
+		titulo: r
+	})
+	res.json(re)
+})
+
+/* //SELECCIONAR POR RANGO//
+
+db.libros.find(
+{
+'ficha_bibliografica.paginas':{$gte:309},
+'ficha_bibliografica.paginas':{$lte:600}
+},
+{
+_id:0, titulo:1, autor:1
+}
+) */
+router.get("/bucar/rango/:maximo/:minimo", async (req, res) => {
+	const re = await Libro.find({
+		'ficha_bibliografica.paginas': {
+			"$gte": req.params.minimo
+		},
+		'ficha_bibliografica.paginas': {
+			"$lte": req.params.maximo
+		}
+	}, {
+		_id: 0,
+		titulo: 1,
+		autor: 1
+	})
+	res.json(re)
+})
+
+/* db.libros.find(
+{
+'ficha_bibliografica.edicion':'primera'
+}
+
+) */
+router.get("/buscar/edicion/:edicion", async (req, res) => {
+	const re = await Libro.find({
+		'ficha_bibliografica.edicion': req.params.edicion
+	})
+	res.json(re)
+})
+
+/* // SELECCIONAR  ARRAY//
+
+db.libros.find(
+    {
+    autores:{nombre:'Aurelio Baldor'}
+    }
+) */
+router.get("/bucar/autor/:autor", async (req, res) => {
+	const re = await Libro.find({
+		"autores.nombre": req.params.autor
+	})
+	res.json(re)
+})
+
+/* db.tipo_libro.insertMany([
+  { _id: "Siete Novelas", ancestors: [ "Tipo_Libro", "Series" ], parent: "Series" },
+  { _id: "Seis Novelas", ancestors: [ "Tipo_Libro", "Series" ], parent: "Series" },
+  { _id: "Cinco Novelas", ancestors: [ "Tipo_Libro", "Series" ], parent: "Series" },
+  { _id: "Cuatro Novelas", ancestors: [ "Tipo_Libro", "Series" ], parent: "Series" },
+  { _id: "Tres Novelas", ancestors: [ "Tipo_Libro", "Series" ], parent: "Series" },
+  { _id: "Dos Novelas", ancestors: [ "Tipo_Libro", "Series" ], parent: "Series" },
+  { _id: "Heptalogia", ancestors: [ "Tipo_Libro", "Sagas" ], parent: "Sagas" },
+  { _id: "Setalogia", ancestors: [ "Tipo_Libro", "Sagas" ], parent: "Sagas" },
+  { _id: "Pentalogia", ancestors: [ "Tipo_Libro", "Sagas" ], parent: "Sagas" },
+  { _id: "Tetralogia", ancestors: [ "Tipo_Libro", "Sagas" ], parent: "Sagas" },
+  { _id: "Trilogia", ancestors: [ "Tipo_Libro", "Sagas" ], parent: "Sagas" },
+  { _id: "Duologia", ancestors: [ "Tipo_Libro", "Sagas" ], parent: "Sagas" },
+  { _id: "Unico", ancestors: [ "Tipo_Libro" ], parent: "Tipo_Libro" },
+  { _id: "Sagas", ancestors: [ "Tipo_Libro" ], parent: "Tipo_Libro" },
+  { _id: "Series", ancestors: [ "Tipo_Libro" ], parent: "Tipo_Libro" },
+  { _id: "Tipo_Libro", ancestors: [ ], parent: null }
+] ) */
+
+router.get("/tipo_libro",async(req,res)=>{
+	const re=await Tipo_Libro.find()
 	res.json(re)
 })
 
