@@ -7,6 +7,12 @@ const Tipo_Libro=require("../models/tipo_libro")
 
 /* Rutas para las consultas */
 
+// /* Buscar por autor */
+// router.get("/buscar/autor/:autor",async(req,res)=>{
+// 	const re=await Libro.find({"autores.nombre":req.params.nombre})
+// 	res.json(re)
+// })
+
 /* 
 CRUD INSERTAR
 
@@ -424,9 +430,9 @@ db.libros.find(
     autores:{nombre:'Aurelio Baldor'}
     }
 ) */
-router.get("/bucar/autor/:autor", async (req, res) => {
+router.get("/buscar/autor/:autor", async (req, res) => {
 	const re = await Libro.find({
-		"autores.nombre": req.params.autor
+		"autores.nombre":req.params.autor
 	})
 	res.json(re)
 })

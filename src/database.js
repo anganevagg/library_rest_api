@@ -3,6 +3,7 @@ const db = require('./config/keys').mogodbURI
 
 /* Configuración de la base de datos */
 mongoose.connect(db, { useNewUrlParser:true, useUnifiedTopology:true })
+	// db.collection()
 	/* Se espera de manera asincrona a que se conecte la db */
 	.then(()=>{
 		console.log('db is connect')
