@@ -38,6 +38,6 @@ const LibroSchema = new Schema({
 		},
 		Descripcion:String
 	}
-},{collection:"libro"})
+},{collection:"libros"})
 
 module.exports = mongoose.model("Libro", LibroSchema);
