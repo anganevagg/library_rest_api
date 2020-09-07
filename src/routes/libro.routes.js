@@ -246,5 +246,103 @@ db.libros.update(
       
   }
 ) */
+router.post("/insertar/nombre",async(req,res)=>{
+	await Libro.find({},{
+		"$set":{
+			'autores.$[elem].Fecha_nacimiento':"18/28/1887"
+		},
+		"arrayFilters":[{
+			"elem.nombre":"Simon Bolivar"
+		}]
+	})
+})
+
+/* 
+ARRAY DELETE
+
+db.libros.update(
+  {
+       "_id" : ObjectId ("5f528e24c17be955e385bbd9")
+  },
+  
+  {$pull:
+        {
+             autores:{nombre:" Jhon Lennon "}
+        }
+                  
+    
+  }      
+)
+*/
+
+router.delete("/delete/array/:id",async(req,res)=>{
+	await Libro.findByIdAndUpdate(req.params.id,{
+		"$pull":{
+			autores:{
+				nombre:"Jhon Lennon"
+			}
+		}
+	})
+	await res.json(Libro.findById(req.params.id))
+})
+
+/* 
+//ORDENAR POR TIPO  Y CATEGORIA////
+
+db.libros.find(
+{$and:
+    [
+    {'categoria':{$nin:['Literaturas de otras lenguas']}},
+    {'ficha_bibliografica.paginas':{$gt:309}}
+    ]
+}
+
+).sort(
+        {categoria:1}
+) */
+
+router.get("/buscar/and/ordenar/:categoria/:paginas",async(req,res)=>{
+	const re = await Libro.find({"$and":[
+		{categoria:{"$nin":[req.params.categoria]}},
+		{'ficha_bibliografica.paginas':{"$gt":req.params.paginas}}
+	]}).sort({categoria:1})
+	res.json(re)
+})
+
+/* 
+//PROYECCION POR TITULO, TIPO Y CATEGORIA////
+
+db.libros.find(
+{$and:
+    [
+    {'categoria':{$nin:['Literaturas de otras lenguas']}},
+    {'ficha_bibliografica.paginas':{$gt:309}}
+    ]
+},
+{
+_id:0, titulo:1, tipo:1, categoria:1
+}
+) */
+router.get("/buscar/and/proyeccion/:categoria/:paginas",async(req,res)=>{
+	const re=await Libro.find({"$and":[
+		{categoria:{"$nin":[req.params.categoria]}},
+		{'ficha_bibliografica.paginas':{"$gt":req.params.paginas}}
+	]},{_id:0,titulo:1,tipo:1,categoria:1})
+	res.json(re)
+})
+
+/* REGEXP 
+
+db.libros.find(
+{
+'titulo':/^A/
+}
+
+) */
+router.get("/bucar/letra/:letra",async(req,res)=>{
+	const r = new RegExp(`^${req.params.letra}`)
+	const re = await Libro.find({titulo:r})
+	res.json(re)
+})
 
 module.exports = router;
