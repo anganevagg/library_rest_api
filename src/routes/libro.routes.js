@@ -544,13 +544,15 @@ router.get("/insertar/tipo_libro", async (req, res) => {
 /* //ARBOL BORRAR//
 
 db.tipo_libro.drop() */
-router.delete("/delete/tipo_libro",async(req,res)=>{
+router.delete("/delete/tipo_libro", async (req, res) => {
 	await Tipo_Libro.collection.drop()
-	res.json({status:"arbol borrado"})
+	res.json({
+		status: "arbol borrado"
+	})
 })
 // Ver tipo_libro
-router.get("/tipo_libro",async(req,res)=>{
-	const re=Tipo_Libro.find()
+router.get("/tipo_libro", async (req, res) => {
+	const re = Tipo_Libro.find()
 	res.json(re)
 })
 
@@ -568,9 +570,11 @@ codigo_isbn:9854252622.0,
         }
 ); 
 */
-router.get("/buscar/codigo_isbn/:codigo",async(req,res)=>{
-	const re = (await Libro.find({codigo_isbn:req.params.codigo})).forEach((fic)=>{
-		res.send("Si existen libros con el titulo : " + fic.titulo+ " de tipo: " + fic.tipo + "." );
+router.get("/buscar/codigo_isbn/:codigo", async (req, res) => {
+	const re = (await Libro.find({
+		codigo_isbn: req.params.codigo
+	})).forEach((fic) => {
+		res.send("Si existen libros con el titulo : " + fic.titulo + " de tipo: " + fic.tipo + ".");
 	})
 })
 
@@ -578,8 +582,10 @@ router.get("/buscar/codigo_isbn/:codigo",async(req,res)=>{
 
 db.tipo_libro.find( { ancestors: "Tipo_Libro" } )
  */
-router.get("/buscar/tipo_libro/desendientes/:ancestors",async(req,res)=>{
-	const re=await Tipo_Libro.find({ancestors:req.params.ancestors})
+router.get("/buscar/tipo_libro/desendientes/:ancestors", async (req, res) => {
+	const re = await Tipo_Libro.find({
+		ancestors: req.params.ancestors
+	})
 	res.json(re)
 })
 
@@ -587,8 +593,8 @@ router.get("/buscar/tipo_libro/desendientes/:ancestors",async(req,res)=>{
 
 db.tipo_libro.findOne( { _id: "Trilogia" } ).ancestors 
 */
-router.get("/buscar/tipo_libro/ancestros/:ancestors",async(req,res)=>{
-	const re=await Tipo_Libro.findById(req.params.ancestors)
+router.get("/buscar/tipo_libro/ancestros/:ancestors", async (req, res) => {
+	const re = await Tipo_Libro.findById(req.params.ancestors)
 	res.json(re.ancestors)
 })
 
