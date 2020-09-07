@@ -29,13 +29,13 @@ const LibroSchema = new Schema({
 		paginas:Number,
 		edicion:String,
 		encuadernacion:String,
-		editorial:[{
+		editorial:{
 			nombre_editorial:String,
 			tipo:String,
 			pais:String,
 			idioma:String
 
-		}],
+		},
 		Descripcion:String
 	}
 })

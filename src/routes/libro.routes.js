@@ -6,7 +6,39 @@ const Libro = require("../models/libro");
 
 /* Rutas para las consultas */
 
-/* CREATE */
+/* 
+CRUD INSERTAR
+
+db.libros.insert(
+  {
+  'codigo_isbn':9788422616931,
+  'titulo': "Vientos de guerra",
+  'autores': [
+               {
+                   "nombre": " Herman Wouk ",
+                   "Fecha_nacimiento":"27/05/1915",
+                   "Pais":"Estados Unidos"
+                }
+             ],
+            
+  'categoria':"Literaturas de otras lenguas",
+  'tipo':"Trilogia",
+  'ficha_bibliografica': {
+                         'año':1971,
+                         'paginas':1080,
+			             'edicion': 'primera',
+			             'encuadernacion':'Tapa dura',
+			             'editorial' :  {
+			                             'nombre_editorial':'Grijalbo',
+			                             'tipo':'tradicional',
+			                             'pais':'Estados Unidos'
+			                            },
+			               'idioma': 'Ingles'
+                       },
+  'Descripcion':' La batalla de Inglaterra, el avance nazi sobre Moscú'           
+}
+) 
+*/
 router.post("/", async (req, res) => {
 	const {
 		codigo_isbn,
@@ -30,29 +62,30 @@ router.post("/", async (req, res) => {
 	})
 })
 
-/* READ  */
+/* READ */
 router.get("/", async (req, res) => {
 	const libros = await Libro.find();
 	res.json(libros);
 });
 
-/* UPDATE */
+/* 
+CRUD UPDATE
+
+db.tienda.update(
+	{
+		_id:ObjectId("5f515ea92fec5e2cd8a8f943")
+	}, 
+	{ 
+	$set:{titulo:'La flecha roja'}
+	} 
+)
+ */
 router.put("/:id", async (req, res) => {
 	const {
-		codigo_isbn,
-		titulo,
-		autores,
-		categoria,
-		tipo,
-		ficha_bibliografica
+		titulo
 	} = req.body
 	const newLibro = {
-		codigo_isbn,
-		titulo,
-		autores,
-		categoria,
-		tipo,
-		ficha_bibliografica
+		titulo
 	}
 	await Libro.findByIdAndUpdate(req.params.id, newLibro)
 	res.json({
@@ -60,7 +93,15 @@ router.put("/:id", async (req, res) => {
 	})
 })
 
-/* DELETE */
+/*
+CRUD DELETE
+
+db.libros.remove(
+     { 
+       "_id" : ObjectId ("5f4ff8875b1a556d7101d69b")
+     }
+) 
+*/
 router.delete("/:id", async (req, res) => {
 	await Libro.findByIdAndRemove(req.params.id)
 	res.json({
@@ -69,128 +110,141 @@ router.delete("/:id", async (req, res) => {
 })
 
 /* 
-Consulta por cadena que termina con una letra
-db.libros.find({
-	'titulo':/r$/
-}) 
-*/
-router.get("/buscar/ultimaLetra/:letra", async (req, res) => {
-	const r = new RegExp(`${req.params.letra}$`)
-	const re = await Libro.find({
-		titulo: r
-	})
-	res.json(re)
-})
+UPDATE SUBDOCUMENTO
 
-/* 
-Consulta con dos condiciones y operador $and
-
-db.libros.find({
-   $and:[ {
-    'titulo':/^H/
-    },
-    {
-    'categoria':/o$/
-    }
-   ]
-})
-*/
-router.get("/buscar/and/:letra/:letraFinal", async (req, res) => {
-	const r1 = new RegExp(`^${req.params.letra}`)
-	const r2 = new RegExp(`${req.params.letraFinal}$`)
-	const re = await Libro.find({
-		"$and": [{
-				titulo: r1
-			},
-			{
-				categoria: r2
-			}
-		]
-	})
-	res.json(re)
-})
-
-/*  
-Actualización mediante el uso de $set
 
 db.libros.update(
-{
-    titulo:'Simon Bolivar'
-},
-{
-$set: {titulo:'La vida de Simon Bolivar'}
-}
-)
+  {
+       "_id" : ObjectId ("5f4ffcbc5b1a556d7101d69c")
+  },
+  
+  {$set:
+        {
+              "ficha_bibliografica.edicion" : "cuarta"
+        }
+                  
+    
+  }      
+) 
 */
-router.get("/actualizar/titulo/:titulo/:nuevoTitulo", async (req, res) => {
-	await Libro.update({
-		titulo: req.params.titulo
-	}, {
-		"$set": {
-			titulo: req.params.nuevoTitulo
+router.put("/update/edicion/:id",async(req,res)=>{
+	await Libro.findByIdAndUpdate(req.params.id, {
+		"$set":{
+			'ficha_bibliografica.edicion':req.body.edicion
 		}
 	})
 	res.json({
-		status: "Titulo actualizado"
+		status:"Edicion actualizada"
 	})
 })
 
-/* 
-Actualización de un elemento del arreglo
 
-db.libros.update(
-{
-    titulo:'La vida de Simon Bolivar',
-    'autores.nombre':'Simon Bolivar '
-},
-{
-$set: {'autores.$.nombre':'El libertador'}
+/* INSERTAR SUBDOCUMENTO
+
+db.libros.insert(
+{ 
+       "_id" : ObjectId ("5f4ffcbc5b1a556d7101d69c")
+   }, 
+   {
+	$set : {
+		    "ficha_bibliografica.edicion" : "cuarta"
+	        }
 }
-)
-*/
-router.get("/actualizar/autor/:titulo/:nombre/:nombreNuevo", async (req, res) => {
-	await Libro.update({
-		titulo: req.params.titulo,
-		'autores.nombre': req.params.nombre
-	}, {
-		'$set': {
-			'autores.$.nombre': req.params.nombreNuevo
+) */
+router.put("/insertar/edicion/:id",async(req,res)=>{
+	await Libro.findByIdAndUpdate(req.params.id, {
+		"$set":{
+			'ficha_bibliografica.edicion':req.body.edicion
 		}
 	})
 	res.json({
-		status: "Autor actualizado"
+		status:"Edicion insertada"
 	})
 })
 
 /* 
-Añadir de un elemento a un arreglo
+DELETE SUBDOCUMENTO
 
 db.libros.update(
-  { "_id" : ObjectId ("5f545dcd3bf21c3608eae5ef")},
-  {$push:{
-	  ficha_bibliografica.editorial:
-                  {
-					  nombre_editorial:"Grupo Editorial Patria"
-					  ,pais: "Peru"
-				  }
-
-               
-      }
-})
+  {
+       "_id" : ObjectId ("5f4ffcbc5b1a556d7101d69c")
+  },
+  
+  {$unset:
+        {
+              "ficha_bibliografica.edicion" : "cuarta"
+        }
+                  
+    
+  }      
+) 
 */
-router.get("/push/ficha/:id/:editorial/:pais", async (req, res) => {
-	const re = await Libro.findByIdAndUpdate(req.params.id, {
-		"$push": {
-			'ficha_bibliografica.editorial': {
-				nombre_editorial: req.params.editorial,
-				pais: req.params.pais
+router.delete("/delete/edicion/:id",async(req,res)=>{
+	await Libro.findByIdAndUpdate(req.params.id,{
+		"$unset":{
+			"ficha_bibliografica.edicion" : "cuarta"
+		}
+	})
+})
+
+/* 
+INSERTAR ARRAY
+
+db.libros.update(
+  { 
+      "_id" : ObjectId ("5f4ff8875b1a556d7101d69b")
+  },
+  {$push:
+      {
+          autores: {$each:
+                 [
+                      {
+                      "nombre": "Pablo Neruda",
+                      "Fecha_nacimiento":"12/04/1955",
+                      "Pais":"Colombia"
+                      }
+                                     
+                 ]
+          }    
+      }    
+  }
+) 
+*/
+router.post("/insertar/autores/:id",async(req,res)=>{
+	const {nombre,Fecha_nacimiento,Pais}=req.body
+	await Libro.findByIdAndUpdate(req.params.id,{
+		"$push":{
+			autores:{
+				"$each":[{
+					nombre,
+					Fecha_nacimiento,
+					Pais
+				}]
 			}
 		}
 	})
-	res.json(
-		{status: "Push correcto"},
-		re
-	)
+	res.json({
+		status:"Autor agregado"
+	})
 })
+
+/* ARRAY UPDATE//
+//Modificar elementos de un arreglo condicionados
+
+
+db.libros.update(
+  {},
+  {$set:{
+            'autores.$[elem].Fecha_nacimiento':' 18/28/1887 '
+        }       
+      },
+  {arrayFilters: 
+      [
+          {"elem.nombre":"Simon Bolivar"  }
+      ],
+      multi : true
+      
+  }
+) */
 
 module.exports = router;
