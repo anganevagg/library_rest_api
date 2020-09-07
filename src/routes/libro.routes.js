@@ -3,7 +3,7 @@ const router = express.Router();
 
 /* Esquema de libro */
 const Libro = require("../models/libro");
-const Tipo_Libro=require("../models/tipo_libro")
+const Tipo_Libro = require("../models/tipo_libro")
 
 /* Rutas para las consultas */
 
@@ -432,7 +432,7 @@ db.libros.find(
 ) */
 router.get("/buscar/autor/:autor", async (req, res) => {
 	const re = await Libro.find({
-		"autores.nombre":req.params.autor
+		"autores.nombre": req.params.autor
 	})
 	res.json(re)
 })
@@ -456,9 +456,101 @@ router.get("/buscar/autor/:autor", async (req, res) => {
   { _id: "Tipo_Libro", ancestors: [ ], parent: null }
 ] ) */
 
-router.get("/tipo_libro",async(req,res)=>{
-	const re=await Tipo_Libro.find()
+router.get("/insertar/tipo_libro", async (req, res) => {
+	const re = await Tipo_Libro.insertMany([{
+			_id: "Siete Novelas",
+			ancestors: ["Tipo_Libro", "Series"],
+			parent: "Series"
+		},
+		{
+			_id: "Seis Novelas",
+			ancestors: ["Tipo_Libro", "Series"],
+			parent: "Series"
+		},
+		{
+			_id: "Cinco Novelas",
+			ancestors: ["Tipo_Libro", "Series"],
+			parent: "Series"
+		},
+		{
+			_id: "Cuatro Novelas",
+			ancestors: ["Tipo_Libro", "Series"],
+			parent: "Series"
+		},
+		{
+			_id: "Tres Novelas",
+			ancestors: ["Tipo_Libro", "Series"],
+			parent: "Series"
+		},
+		{
+			_id: "Dos Novelas",
+			ancestors: ["Tipo_Libro", "Series"],
+			parent: "Series"
+		},
+		{
+			_id: "Heptalogia",
+			ancestors: ["Tipo_Libro", "Sagas"],
+			parent: "Sagas"
+		},
+		{
+			_id: "Setalogia",
+			ancestors: ["Tipo_Libro", "Sagas"],
+			parent: "Sagas"
+		},
+		{
+			_id: "Pentalogia",
+			ancestors: ["Tipo_Libro", "Sagas"],
+			parent: "Sagas"
+		},
+		{
+			_id: "Tetralogia",
+			ancestors: ["Tipo_Libro", "Sagas"],
+			parent: "Sagas"
+		},
+		{
+			_id: "Trilogia",
+			ancestors: ["Tipo_Libro", "Sagas"],
+			parent: "Sagas"
+		},
+		{
+			_id: "Duologia",
+			ancestors: ["Tipo_Libro", "Sagas"],
+			parent: "Sagas"
+		},
+		{
+			_id: "Unico",
+			ancestors: ["Tipo_Libro"],
+			parent: "Tipo_Libro"
+		},
+		{
+			_id: "Sagas",
+			ancestors: ["Tipo_Libro"],
+			parent: "Tipo_Libro"
+		},
+		{
+			_id: "Series",
+			ancestors: ["Tipo_Libro"],
+			parent: "Tipo_Libro"
+		},
+		{
+			_id: "Tipo_Libro",
+			ancestors: [],
+			parent: null
+		}
+	])
 	res.json(re)
 })
 
+/* //ARBOL BORRAR//
+
+db.tipo_libro.drop() */
+router.delete("/delete/tipo_libro",async(req,res)=>{
+	await Tipo_Libro.collection.drop()
+	res.json({status:"arbol borrado"})
+})
+// Ver tipo_libro
+router.get("/tipo_libro",async(req,res)=>{
+	const re=Tipo_Libro.find()
+	res.json(re)
+})
 module.exports = router;
